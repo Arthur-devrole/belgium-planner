@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Mijn Planner Website</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+    .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    .admin-container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    .hidden { display: none; }
+    input, select, textarea, button { width: 100%; padding: 10px; margin: 10px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 8px; border: 1px solid #ccc; text-align: left; }
+    header { text-align: center; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mijn Planner Website</h1>
+  </header>
+
+  <div class="container" id="login-screen">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Gebruikersnaam">
+    <input type="password" id="password" placeholder="Wachtwoord">
+    <button onclick="login()">Inloggen</button>
+  </div>
+
+  <div class="container hidden" id="planner-screen">
+    <h2>Welkom, <span id="user-name"></span></h2>
+    <h3>Planner</h3>
+    <form onsubmit="submitPlanner(); return false;">
+      <label>Uw naam</label>
+      <input type="text" id="naam" placeholder="Uw naam">
+      <label>Datum</label>
+      <input type="date" id="datum">
+      <label>Lijn</label>
+      <input type="text" id="lijn" placeholder="Lijn">
+      <label>Vertrek</label>
+      <input type="text" id="vertrek" placeholder="Vertrek">
+      <label>Aankomst</label>
+      <input type="text" id="aankomst" placeholder="Aankomst">
+      <label>Aantal personen</label>
+      <input type="number" id="personen" placeholder="Aantal personen">
+      <label>Opmerkingen</label>
+      <textarea id="opmerking" placeholder="Opmerkingen"></textarea>
+      <button type="submit">Verstuur</button>
+    </form>
+  </div>
+
+  <div class="admin-container hidden" id="admin-screen">
+    <h2>Admin Agenda</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Gebruiker</th>
+          <th>Naam</th>
+          <th>Datum</th>
+          <th>Lijn</th>
+          <th>Vertrek</th>
+          <th>Aankomst</th>
+          <th>Personen</th>
+          <th>Opmerking</th>
+        </tr>
+      </thead>
+      <tbody id="agenda-entries"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const users = {
+      'arthur': { password: '1234', admin: false },
+      'admin': { password: 'admin', admin: true }
+    };
+
+    const entries = [];
+
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const user = users[username];
+
+      if (user && user.password === password) {
+        document.getElementById('login-screen').classList.add('hidden');
+        if (user.admin) {
+          document.getElementById('admin-screen').classList.remove('hidden');
+          renderAgenda();
+        } else {
+          document.getElementById('planner-screen').classList.remove('hidden');
+          document.getElementById('user-name').textContent = username;
+          localStorage.setItem('currentUser', username);
+        }
+      } else {
+        alert('Ongeldige login');
+      }
+    }
+
+    function submitPlanner() {
+      const entry = {
+        gebruiker: localStorage.getItem('currentUser'),
+        naam: document.getElementById('naam').value,
+        datum: document.getElementById('datum').value,
+        lijn: document.getElementById('lijn').value,
+        vertrek: document.getElementById('vertrek').value,
+        aankomst: document.getElementById('aankomst').value,
+        personen: document.getElementById('personen').value,
+        opmerking: document.getElementById('opmerking').value
+      };
+      entries.push(entry);
+      alert('Informatie opgeslagen!');
+    }
+
+    function renderAgenda() {
+      const tbody = document.getElementById('agenda-entries');
+      tbody.innerHTML = '';
+      entries.forEach(entry => {
+        const row = `<tr>
+          <td>${entry.gebruiker}</td>
+          <td>${entry.naam}</td>
+          <td>${entry.datum}</td>
+          <td>${entry.lijn}</td>
+          <td>${entry.vertrek}</td>
+          <td>${entry.aankomst}</td>
+          <td>${entry.personen}</td>
+          <td>${entry.opmerking}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+  </script>
+</body>
+</html>
